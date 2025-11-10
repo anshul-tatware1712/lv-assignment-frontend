@@ -1,59 +1,59 @@
-# SecureAuth - N-Device Authentication System
+# Multi-Device Authentication Frontend
 
-A modern web application built with Next.js, Express.js, MongoDB, and Auth0 that implements secure N-device session management. Users can only be logged in on a maximum of 3 devices simultaneously, with graceful handling when the limit is exceeded.
+A modern Next.js frontend application that provides secure multi-device authentication with session management. Built with TypeScript, Tailwind CSS, and Auth0 integration.
 
-## Features
+## 🚀 Features
 
-- **N-Device Limit Control**: Maximum 3 concurrent device sessions per user
-- **Graceful Device Management**: Users can choose which device to logout when limit is exceeded
-- **Modern UI**: Professional, responsive design with Tailwind CSS
-- **Phone Number Collection**: Secure storage and management of user contact information
-- **Real-time Session Monitoring**: Automatic device tracking and session validation
-- **Auth0 Integration**: Enterprise-grade authentication and authorization
+- **Multi-Device Session Management**: Handle authentication across multiple devices
+- **Real-time Session Validation**: Automatic session checking every 60 seconds
+- **Cross-Device Logout Detection**: Immediate notification when logged out from another device
+- **Device Selection Modal**: Choose which device to logout when limit is exceeded
+- **Profile Management**: Update user profile information including phone numbers
+- **Modern UI/UX**: Responsive design with Tailwind CSS and Lucide icons
+- **Auth0 Integration**: Enterprise-grade authentication
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-### Frontend
-- **Next.js 16** - React framework with App Router
+- **Next.js 15** - React framework with App Router
 - **TypeScript** - Type-safe development
-- **Tailwind CSS** - Modern styling framework
-- **Auth0 React SDK** - Authentication integration
+- **Tailwind CSS** - Utility-first CSS framework
+- **Auth0 React SDK** - Authentication provider
 - **Lucide React** - Modern icon library
 
-### Backend
-- **Express.js** - Node.js web framework
-- **MongoDB** - NoSQL database for session storage
-- **Mongoose** - MongoDB object modeling
-- **CORS** - Cross-origin resource sharing
-- **Helmet** - Security middleware
-- **Rate Limiting** - API protection
-
-## Architecture
+## 📁 Project Structure
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Next.js App   │    │   Express API   │    │    MongoDB      │
-│                 │    │                 │    │                 │
-│ • Auth0 Login   │◄──►│ • Session Mgmt  │◄──►│ • User Sessions │
-│ • Device UI     │    │ • Device Limit  │    │ • Device Data   │
-│ • Profile Page  │    │ • Phone Storage │    │ • Phone Numbers │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+app/
+├── components/
+│   ├── Profile/
+│   │   └── Profile.tsx          # Main profile component
+│   ├── DeviceSelectionModal.tsx # Device management modal
+│   ├── LoggedOutModal.tsx       # Session expired modal
+│   ├── UpdateProfileModal.tsx   # Profile update modal
+│   ├── AuthProvider.tsx         # Auth0 provider wrapper
+│   └── ui/                      # Reusable UI components
+├── lib/
+│   ├── apiUtils.ts             # API utility functions
+│   ├── deviceUtils.ts          # Device fingerprinting
+│   └── sessionApi.ts           # Session management API
+└── Utils/
+    └── profile.utils.ts        # Profile utility functions
 ```
 
-## Getting Started
+## 🚦 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ and npm
-- MongoDB (local or cloud instance)
-- Auth0 account and application
+- Auth0 account and application setup
+- Backend API server running
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd lv-assignment
+   git clone https://github.com/anshul-tatware1712/lv-assignment-frontend.git
+   cd lv-assignment-frontend
    ```
 
 2. **Install dependencies**
@@ -72,214 +72,168 @@ A modern web application built with Next.js, Express.js, MongoDB, and Auth0 that
    NEXT_PUBLIC_AUTH0_DOMAIN=your-domain.auth0.com
    NEXT_PUBLIC_AUTH0_CLIENT_ID=your-client-id
    
-   # MongoDB Configuration
-   MONGODB_URI=mongodb://localhost:27017/auth-sessions
-   
-   # Server Configuration
-   PORT=5000
-   NODE_ENV=development
+   # Backend API URL
+   NEXT_PUBLIC_BACKEND_URL=http://localhost:8000/api
    ```
 
-4. **Start MongoDB**
+4. **Run the development server**
    ```bash
-   # Local MongoDB
-   mongod
-   
-   # Or use MongoDB Atlas (cloud)
-   # Update MONGODB_URI in .env.local
-   ```
-
-5. **Run the application**
-   ```bash
-   # Starts both frontend (port 3000) and backend (port 5000)
    npm run dev
-   
-   # Or run separately:
-   npm run client  # Frontend only
-   npm run server  # Backend only
    ```
+
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 🔧 Configuration
 
 ### Auth0 Setup
 
-1. Create an Auth0 application (Single Page Application)
-2. Configure allowed callback URLs: `http://localhost:3000/profile`
-3. Configure allowed logout URLs: `http://localhost:3000`
-4. Configure allowed web origins: `http://localhost:3000`
+1. Create an Auth0 Single Page Application
+2. Configure the following settings:
+   - **Allowed Callback URLs**: `http://localhost:3000/profile`
+   - **Allowed Logout URLs**: `http://localhost:3000`
+   - **Allowed Web Origins**: `http://localhost:3000`
 
-## API Endpoints
+### Environment Variables
 
-### Session Management
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NEXT_PUBLIC_AUTH0_DOMAIN` | Your Auth0 domain | ✅ |
+| `NEXT_PUBLIC_AUTH0_CLIENT_ID` | Your Auth0 client ID | ✅ |
+| `NEXT_PUBLIC_BACKEND_URL` | Backend API base URL | ✅ |
 
-- `POST /api/sessions/check` - Check device limit and session validity
-- `POST /api/sessions/force-logout` - Force logout a specific device
-- `POST /api/sessions/logout` - Logout current device
-- `GET /api/sessions/user/:userId` - Get user session data
-- `POST /api/sessions/phone` - Update user phone number
-- `GET /api/health` - Health check endpoint
+## 🔐 Authentication Flow
 
-### Request/Response Examples
+1. **Login**: User authenticates via Auth0
+2. **Device Registration**: System registers device with unique fingerprint
+3. **Session Validation**: Continuous validation every 60 seconds
+4. **Multi-Device Handling**: 
+   - If device limit exceeded, show device selection modal
+   - If logged out from another device, show logged out modal
+5. **Profile Management**: Users can update their profile information
 
-**Check Session:**
-```javascript
-POST /api/sessions/check
-{
-  "userId": "auth0|123456789",
-  "email": "user@example.com",
-  "name": "John Doe",
-  "deviceId": "device_abc123"
-}
-```
+## 📱 Key Components
 
-**Response (Success):**
-```javascript
-{
-  "success": true,
-  "action": "allow",
-  "deviceId": "device_abc123",
-  "message": "Device added successfully"
-}
-```
+### Profile Component
+- Main dashboard displaying user information
+- Real-time session monitoring
+- Device management interface
 
-**Response (Limit Exceeded):**
-```javascript
-{
-  "success": false,
-  "action": "choose_device",
-  "devices": [
-    {
-      "deviceId": "device_xyz789",
-      "deviceName": "iPhone",
-      "loginTime": "2024-11-08T10:30:00Z",
-      "lastActive": "2024-11-08T11:45:00Z"
-    }
-  ],
-  "message": "Maximum 3 devices allowed. Please choose a device to log out."
-}
-```
+### DeviceSelectionModal
+- Appears when device limit is exceeded
+- Allows users to choose which device to logout
+- Displays device information and last active time
 
-## Database Schema
+### LoggedOutModal
+- Triggered when user is logged out from another device
+- Provides clear messaging and re-login option
+- Prevents further app usage until re-authentication
 
-### UserSession Collection
+### UpdateProfileModal
+- Form for updating user profile information
+- Validates phone number format
+- Real-time form validation
 
-```javascript
-{
-  userId: String,        // Auth0 user ID
-  email: String,         // User email
-  name: String,          // User full name
-  phoneNumber: String,   // User phone number
-  devices: [             // Array of device sessions
-    {
-      deviceId: String,
-      deviceName: String,
-      userAgent: String,
-      ipAddress: String,
-      loginTime: Date,
-      lastActive: Date
-    }
-  ],
-  maxDevices: Number,    // Device limit (default: 3)
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+## 🔄 Session Management
 
-## Key Features Implementation
+The application implements robust session management:
 
-### N-Device Limit System
+- **Periodic Checks**: Validates session every 60 seconds
+- **Visibility Detection**: Checks session when user returns to tab
+- **Focus Events**: Validates session when window gains focus
+- **Error Handling**: Graceful handling of network errors and session timeouts
 
-1. **Device Fingerprinting**: Unique device IDs generated from user agent and timestamp
-2. **Session Validation**: Real-time checking against MongoDB records
-3. **Graceful Overflow**: User-friendly device selection when limit exceeded
-4. **Automatic Cleanup**: Inactive sessions can be managed through database TTL
+## 🎨 UI/UX Features
 
-### Security Features
+- **Responsive Design**: Works seamlessly on desktop and mobile
+- **Loading States**: Smooth loading indicators during API calls
+- **Error Handling**: User-friendly error messages
+- **Modern Icons**: Lucide React icons throughout the interface
+- **Accessibility**: Proper ARIA labels and keyboard navigation
 
-- **Rate Limiting**: 100 requests per 15 minutes per IP
-- **CORS Protection**: Configured for specific origins
-- **Helmet Security**: Standard security headers
-- **Input Validation**: Request body validation and sanitization
-- **Error Handling**: Comprehensive error responses without sensitive data exposure
+## 🚀 Deployment
 
-## Deployment
-
-### Frontend (Vercel/Netlify)
-
-1. Build the Next.js application:
-   ```bash
-   npm run build
-   ```
-
-2. Deploy to your preferred platform with environment variables
-
-### Backend (Railway/Heroku/DigitalOcean)
-
-1. Ensure MongoDB connection string is configured
-2. Set production environment variables
-3. Deploy Express server with process manager (PM2)
-
-### Database (MongoDB Atlas)
-
-1. Create MongoDB Atlas cluster
-2. Configure network access and database users
-3. Update connection string in production environment
-
-## Testing
-
-### Manual Testing Scenarios
-
-1. **Single Device Login**: Verify normal authentication flow
-2. **Multiple Device Login**: Test up to 3 concurrent devices
-3. **Device Limit Exceeded**: Test device selection modal
-4. **Force Logout**: Verify device removal and session cleanup
-5. **Phone Number Management**: Test phone number storage and updates
-
-### Load Testing
-
-Use tools like Artillery or k6 to test API endpoints under load:
+### Build for Production
 
 ```bash
-# Example load test
-artillery quick --count 10 --num 100 http://localhost:5000/api/health
+npm run build
+npm start
 ```
 
-## Troubleshooting
+### Deploy to Vercel
+
+1. Connect your GitHub repository to Vercel
+2. Configure environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+### Deploy to Netlify
+
+1. Build the application: `npm run build`
+2. Deploy the `out` folder to Netlify
+3. Configure environment variables in Netlify dashboard
+
+## 🧪 Development
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+
+### Code Style
+
+- TypeScript for type safety
+- ESLint for code quality
+- Prettier for code formatting
+- Tailwind CSS for styling
+
+## 🔍 API Integration
+
+The frontend communicates with the backend through these main endpoints:
+
+- `GET /api/user` - Fetch user profile and devices
+- `POST /api/user/update` - Update user profile
+- `POST /api/user/logout` - Logout specific device
+
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **MongoDB Connection Failed**
-   - Verify MongoDB is running
-   - Check connection string format
-   - Ensure network connectivity
-
-2. **Auth0 Authentication Issues**
+1. **Auth0 Configuration Errors**
    - Verify domain and client ID
-   - Check callback URLs configuration
-   - Ensure HTTPS in production
+   - Check callback URLs
+   - Ensure environment variables are set
 
-3. **CORS Errors**
-   - Update allowed origins in server configuration
-   - Verify frontend and backend URLs match
+2. **API Connection Issues**
+   - Verify backend server is running
+   - Check CORS configuration
+   - Validate API endpoint URLs
 
-4. **Device Limit Not Working**
-   - Check MongoDB document structure
-   - Verify API endpoint responses
-   - Test device ID generation
+3. **Session Management Issues**
+   - Check browser console for errors
+   - Verify device fingerprinting is working
+   - Test with multiple browser tabs/devices
 
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch: `git checkout -b feature/new-feature`
 3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+4. Commit your changes: `git commit -m 'Add new feature'`
+5. Push to the branch: `git push origin feature/new-feature`
+6. Submit a pull request
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
-## Support
+## 📞 Support
 
 For support and questions:
 - Create an issue in the repository
 - Check the troubleshooting section
-- Review Auth0 and MongoDB documentation
+- Review Auth0 documentation
+
+---
+
+Built with ❤️ using Next.js and TypeScript
