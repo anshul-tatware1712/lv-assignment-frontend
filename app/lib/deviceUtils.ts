@@ -1,29 +1,15 @@
-// Generate a unique device ID based on browser fingerprinting
+import { v4 as uuidv4 } from 'uuid';
+
 export function generateDeviceId(): string {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  ctx?.fillText('Device fingerprint', 10, 10);
-  const canvasFingerprint = canvas.toDataURL();
+  const existingDeviceId = localStorage.getItem('deviceId');
   
-  const fingerprint = [
-    navigator.userAgent,
-    navigator.language,
-    screen.width + 'x' + screen.height,
-    new Date().getTimezoneOffset(),
-    canvasFingerprint.slice(-50), 
-    localStorage.getItem('deviceId') || Math.random().toString(36)
-  ].join('|');
-  
-  let hash = 0;
-  for (let i = 0; i < fingerprint.length; i++) {
-    const char = fingerprint.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
+  if (existingDeviceId) {
+    return existingDeviceId;
   }
   
-  const deviceId = Math.abs(hash).toString(36);
-  localStorage.setItem('deviceId', deviceId);
-  return deviceId;
+  const newDeviceId = uuidv4();
+  localStorage.setItem('deviceId', newDeviceId);
+  return newDeviceId;
 }
 
 export function getDeviceName(): string {

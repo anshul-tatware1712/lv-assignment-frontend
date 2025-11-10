@@ -75,9 +75,9 @@ export default function UserDetailsModal({
           Please provide your name and phone number to continue.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-black">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" className="block text-sm font-medium mb-1">
               Full Name *
             </label>
             <input
@@ -85,7 +85,7 @@ export default function UserDetailsModal({
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 border text-black! rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.name ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter your full name"
@@ -97,7 +97,7 @@ export default function UserDetailsModal({
           </div>
 
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="phone" className="block text-sm font-medium mb-1">
               Phone Number *
             </label>
             <input
@@ -105,7 +105,7 @@ export default function UserDetailsModal({
               id="phone"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter your phone number"
@@ -120,7 +120,7 @@ export default function UserDetailsModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2 border border-gray-300 text-black rounded-md hover:bg-gray-50 transition-colors"
               disabled={loading}
             >
               Cancel
