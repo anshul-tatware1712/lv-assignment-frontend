@@ -11,9 +11,9 @@ import {
   User as BackendUser,
   Device,
 } from "@/app/lib/apiUtils";
-import DeviceSelectionModal from "@/app/components/DeviceSelectionModal";
-import UpdateProfileModal from "@/app/components/UpdateProfileModal";
-import LoggedOutModal from "@/app/components/LoggedOutModal";
+import DeviceSelectionModal from "@/app/Components/DeviceSelectionModal";
+import UpdateProfileModal from "@/app/Components/UpdateProfileModal";
+import LoggedOutModal from "@/app/Components/LoggedOutModal";
 import Loader from "../Loader";
 
 const Profile = () => {
