@@ -1,4 +1,3 @@
-// API functions for session management
 
 export interface UserProfile {
   userId: string;
@@ -24,7 +23,6 @@ export interface ApiResponse<T = UserProfile> {
 class SessionAPI {
   private baseUrl = '/api';
 
-  // Check user profile completeness
   async checkProfile(userId: string): Promise<ApiResponse<UserProfile>> {
     try {
       const response = await fetch(`${this.baseUrl}/profile?userId=${encodeURIComponent(userId)}`);
@@ -39,7 +37,6 @@ class SessionAPI {
     }
   }
 
-  // Login with device management
   async login(userId: string, email: string, name: string, deviceId: string, deviceName: string): Promise<ApiResponse<UserProfile>> {
     try {
       const response = await fetch(`${this.baseUrl}/User`, {
@@ -65,7 +62,6 @@ class SessionAPI {
     }
   }
 
-  // Update user profile
   async updateProfile(userId: string, name: string, phoneNumber: string): Promise<ApiResponse<UserProfile>> {
     try {
       const response = await fetch(`${this.baseUrl}/User/UpdateUser`, {
@@ -89,10 +85,8 @@ class SessionAPI {
     }
   }
 
-  // Logout (placeholder for now)
   async logout(userId: string): Promise<void> {
     try {
-      // This would typically call the backend logout endpoint
       console.log('Logging out user:', userId);
     } catch (error) {
       console.error('Logout error:', error);
