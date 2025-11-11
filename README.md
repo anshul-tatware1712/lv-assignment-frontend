@@ -7,7 +7,6 @@ A modern Next.js frontend application that provides secure multi-device authenti
 - **Multi-Device Session Management**: Handle authentication across multiple devices
 - **Real-time Session Validation**: Automatic session checking every 60 seconds
 - **Cross-Device Logout Detection**: Immediate notification when logged out from another device
-- **Device Selection Modal**: Choose which device to logout when limit is exceeded
 - **Profile Management**: Update user profile information including phone numbers
 - **Modern UI/UX**: Responsive design with Tailwind CSS and Lucide icons
 - **Auth0 Integration**: Enterprise-grade authentication
@@ -27,7 +26,6 @@ app/
 ├── components/
 │   ├── Profile/
 │   │   └── Profile.tsx          # Main profile component
-│   ├── DeviceSelectionModal.tsx # Device management modal
 │   ├── LoggedOutModal.tsx       # Session expired modal
 │   ├── UpdateProfileModal.tsx   # Profile update modal
 │   ├── AuthProvider.tsx         # Auth0 provider wrapper
@@ -107,7 +105,6 @@ app/
 2. **Device Registration**: System registers device with unique fingerprint
 3. **Session Validation**: Continuous validation every 60 seconds
 4. **Multi-Device Handling**: 
-   - If device limit exceeded, show device selection modal
    - If logged out from another device, show logged out modal
 5. **Profile Management**: Users can update their profile information
 
@@ -117,11 +114,6 @@ app/
 - Main dashboard displaying user information
 - Real-time session monitoring
 - Device management interface
-
-### DeviceSelectionModal
-- Appears when device limit is exceeded
-- Allows users to choose which device to logout
-- Displays device information and last active time
 
 ### LoggedOutModal
 - Triggered when user is logged out from another device
