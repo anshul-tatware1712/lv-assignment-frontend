@@ -2,16 +2,14 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import Image from "next/image";
 import { User, LogOut, Phone, AlertCircle } from "lucide-react";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { getDeviceInfo } from "@/app/lib/deviceUtils";
 import {
   getUser,
   updateUser,
   logoutDevice,
   User as BackendUser,
-  Device,
 } from "@/app/lib/apiUtils";
-import DeviceSelectionModal from "@/app/Components/DeviceSelectionModal";
 import UpdateProfileModal from "@/app/Components/UpdateProfileModal";
 import LoggedOutModal from "@/app/Components/LoggedOutModal";
 import Loader from "../Loader";
@@ -27,13 +25,12 @@ const Profile = () => {
   const [backendUser, setBackendUser] = useState<BackendUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showDeviceModal, setShowDeviceModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showLoggedOutModal, setShowLoggedOutModal] = useState(false);
-  const [deviceModalDevices, setDeviceModalDevices] = useState<Device[]>([]);
+  const isLoggingOut = useRef(false);
 
   const fetchUserData = useCallback(async () => {
-    if (!auth0User?.email) return;
+    if (!auth0User?.email || isLoggingOut.current) return;
 
     try {
       setIsLoading(true);
@@ -46,8 +43,6 @@ const Profile = () => {
         setBackendUser(response.user);
       } else if (response.errorCode === 403) {
         setBackendUser(response?.user || null);
-        setDeviceModalDevices(response?.user?.devices || []);
-        setShowDeviceModal(true);
         setError(response.message);
       } else if (response.errorCode === 400) {
         setShowLoggedOutModal(true);
@@ -55,28 +50,41 @@ const Profile = () => {
         setError(response.message || "Failed to fetch user data");
       }
     } catch (err) {
-      setError("Network error occurred");
-      console.error("Error fetching user:", err);
+      if (!isLoggingOut.current) {
+        setError("Network error occurred");
+        console.error("Error fetching user:", err);
+      }
     } finally {
-      setIsLoading(false);
+      if (!isLoggingOut.current) {
+        setIsLoading(false);
+      }
     }
   }, [auth0User?.email]);
 
   useEffect(() => {
-    if (!auth0Loading && isAuthenticated && auth0User?.email) {
-      fetchUserData();
-    } else if (!auth0Loading && !isAuthenticated) {
+    if (auth0Loading) return;
+
+    if (!isAuthenticated) {
       setIsLoading(false);
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth0Loading, isAuthenticated, auth0User?.email]);
+    if (auth0User?.email && !isLoggingOut.current) {
+      fetchUserData();
+    }
+  }, [auth0Loading, isAuthenticated, auth0User?.email, fetchUserData]);
 
   useEffect(() => {
-    if (!isAuthenticated || !auth0User?.email) return;
+    if (
+      !isAuthenticated ||
+      !auth0User?.email ||
+      showLoggedOutModal ||
+      isLoggingOut.current
+    )
+      return;
 
-    const intervalId = setInterval(async () => {
-      if (!showLoggedOutModal) {
-        await fetchUserData();
+    const intervalId = setInterval(() => {
+      if (!isLoggingOut.current) {
+        fetchUserData();
       }
     }, 60000);
 
@@ -90,7 +98,6 @@ const Profile = () => {
       setIsLoading(true);
       const response = await logoutDevice(backendUser.userId, deviceId);
       if (response.success) {
-        setShowDeviceModal(false);
         await fetchUserData();
       } else {
         setError(response.message || "Failed to logout device");
@@ -126,12 +133,16 @@ const Profile = () => {
 
   const handleLogoutCurrentDevice = async () => {
     if (!backendUser) return;
+
+    isLoggingOut.current = true;
+
     const { deviceId } = getDeviceInfo();
     await handleDeviceLogout(deviceId);
     logout({ logoutParams: { returnTo: window.location.origin } });
   };
 
   const handleRelogin = () => {
+    isLoggingOut.current = true;
     logout({ logoutParams: { returnTo: window.location.origin } });
   };
 
@@ -226,14 +237,6 @@ const Profile = () => {
           </div>
         </div>
       </div>
-
-      <DeviceSelectionModal
-        isOpen={showDeviceModal}
-        onClose={() => setShowDeviceModal(false)}
-        devices={deviceModalDevices}
-        onDeviceSelect={handleDeviceLogout}
-        isLoading={isLoading}
-      />
 
       <UpdateProfileModal
         isOpen={showUpdateModal}
